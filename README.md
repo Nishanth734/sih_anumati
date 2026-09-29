@@ -1,149 +1,311 @@
-# ANUMATI — Government Industrial-Approvals Platform
+# 🏛️ ANUMATI — AI-Powered Single-Window Industrial Clearance Platform
 
-**ANUMATI** is a production-grade, single-window industrial clearances and licensing platform built with **Next.js 14+ (App Router, TypeScript)** and **MongoDB Atlas (via Mongoose)**.
+<div align="center">
 
-The platform streamlines government regulatory approvals across key industrial sectors, providing role-based security, automated workflow routing, field-level compliance validation, rate limiting, an Entrepreneur Profile System with 1-click auto-fill, statutory RAG AI chatbot, vector search using Pinecone, and immutable audit logs.
+![ANUMATI Banner](https://img.shields.io/badge/Smart%20India%20Hackathon-2024-orange?style=for-the-badge)
+![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)
+![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green?style=for-the-badge&logo=mongodb)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38BDF8?style=for-the-badge&logo=tailwind-css)
+
+**Simplifying industrial statutory clearances through AI, OCR, and topological compliance roadmaps.**
+
+[Live Demo](#) · [Problem Statement](#problem-statement) · [Features](#features) · [Architecture](#architecture) · [Setup](#getting-started)
+
+</div>
 
 ---
 
-## 🏗️ Architecture & Directory Structure
+## 📌 Problem Statement
 
-```text
-├── app/
-│   ├── api/
-│   │   ├── auth/
-│   │   │   ├── signup/route.ts      # Rate-limited Zod signup API
-│   │   │   ├── login/route.ts       # Rate-limited bcrypt login API
-│   │   │   ├── logout/route.ts      # Cookie clearing API
-│   │   │   └── me/route.ts          # Authenticated session user endpoint
-│   │   ├── profile/
-│   │   │   └── route.ts             # GET & PUT Profile API with Zod validation
-│   │   ├── chat/
-│   │   │   └── route.ts             # Groq RAG statutory chatbot API route
-│   │   ├── schemes/
-│   │   │   └── route.ts             # Recommended incentive schemes API
-│   │   └── applications/
-│   │       ├── route.ts             # List & Create industrial clearance filings
-│   │       └── [id]/status/route.ts # Officer status review & audit commit
-│   ├── dashboard/
-│   │   ├── entrepreneur/page.tsx    # Entrepreneur filing portal with profile autofill & schemes
-│   │   └── officer/page.tsx         # Sector Officer approval queue & rejection analytics
-│   ├── chat/page.tsx                # Statutory RAG Chatbot UI with citation modal & retry
-│   ├── profile/page.tsx             # Entrepreneur profile management route
-│   ├── roadmap/page.tsx             # Interactive sector stepper checklist
-│   ├── layout.tsx                   # Root layout with Gov navbar, footer, error boundary
-│   └── page.tsx                     # Landing page showcasing portal features
-├── components/
-│   ├── ErrorBoundary.tsx            # React Class Error Boundary for UI resilience
-│   ├── RecommendedSchemes.tsx       # Government subsidy schemes card panel
-│   ├── RejectionAnalyticsPanel.tsx  # Officer aggregate rejection analytics chart
-│   ├── RoadmapStepper.tsx           # Accessible stepper component
-│   └── Navbar.tsx                   # Official header with sector badge & RAG chat link
-├── lib/
-│   ├── db.ts                        # Mongoose connection with HMR caching
-│   ├── auth.ts                      # Bcrypt password hashing (cost 12) & Jose JWT cookies
-│   ├── api-error.ts                 # Centralized API error handler
-│   ├── rate-limit.ts                # In-memory sliding window rate limiter
-│   ├── rag/
-│   │   ├── embeddingService.ts      # @xenova/transformers 384-d dense vector generator
-│   │   ├── groqRagService.ts        # Groq LLM (llama-3.3-70b-versatile) RAG completion
-│   │   ├── retrievalEngine.ts       # Pinecone vector similarity search + keyword fallback
-│   │   └── seedKnowledge.ts         # Hand-authored statutory regulation chunks
-│   └── seedSchemes.ts               # Official government subsidy schemes seed data
-├── models/
-│   ├── User.ts                      # User schema (indexed email, role/sector enums, PAN)
-│   ├── EntrepreneurProfile.ts       # Dedicated profile schema (PAN, GSTIN, phone, address)
-│   ├── Application.ts               # Industrial Clearance schema
-│   ├── SectorKnowledge.ts           # RAG Knowledge Chunks schema
-│   ├── ChatHistory.ts               # User chat message history schema
-│   └── Scheme.ts                    # Statutory incentive schemes schema
-├── scripts/
-│   ├── seed.ts                      # Dev seed script with sample users & profile data
-│   └── upsertKnowledgeToPinecone.ts # Embeds & upserts knowledge chunks to Pinecone vector index
-├── __tests__/
-│   ├── chatRag.test.ts              # RAG retrieval, Groq API & Pinecone tests
-│   ├── schemes.test.ts              # Recommended schemes API tests
-│   ├── analytics.test.ts            # Officer rejection analytics tests
-│   └── validators.test.ts           # Compliance validator tests
-├── middleware.ts                    # Edge JWT verification, CORS & security headers
-├── .env.example                     # Documented environment variables template
-└── .env.local                       # Local development environment configuration
+**Smart India Hackathon 2024**
+
+Industrial entrepreneurs in India face a fragmented, paper-heavy process to obtain statutory clearances — Boiler licenses, Factory licenses, Pollution Control certificates — across multiple departments with no unified visibility. Delays cost crores in idle capital and discourage MSME growth.
+
+**ANUMATI** (अनुमति — meaning *Permission* in Hindi) is a single-window AI platform that:
+- Maps out every mandatory clearance a factory must obtain
+- Verifies uploaded documents using OCR + AI in real time
+- Gives government officers a streamlined review console
+- Provides entrepreneurs a live compliance roadmap with dependency ordering
+
+---
+
+## ✨ Features
+
+### 🏭 For Entrepreneurs
+| Feature | Description |
+|---|---|
+| **Statutory Roadmap** | Visual topological DAG of all required clearances, sorted by dependency order |
+| **AI Compliance Chat** | Ask questions about any clearance — powered by Groq LLM + Pinecone RAG |
+| **Smart Document Verification** | Upload PDFs → OCR extraction → 2-layer AI verification (hard rules + semantic) |
+| **Application Tracker** | Real-time status from `PENDING` → `UNDER_REVIEW` → `APPROVED` |
+| **CAD Pre-Scrutiny** | AI-powered drawing analysis before official submission |
+| **DigiLocker Integration** | Simulated DigiLocker-style document fetch from profile |
+| **SLA Alerts** | Automatic notification if officer review exceeds statutory deadline |
+
+### 🏛️ For Clearance Officers
+| Feature | Description |
+|---|---|
+| **Review Console** | Queue of applications filtered by officer's sector (Boiler / Pollution / Factory) |
+| **Document Viewer** | Side-by-side document review with AI pre-analysis summary |
+| **Approve / Reject** | One-click decisions with mandatory rejection reasons |
+| **Digital Certificate** | Auto-generated downloadable clearance certificate on approval |
+| **Analytics Panel** | Rejection reason breakdown with visual charts |
+
+### 🤖 AI & Intelligence
+- **Layer 1 Verification**: Regex hard rules, date expiry checks, Levenshtein name matching
+- **Layer 2 Verification**: Pinecone vector similarity + Groq LLM semantic analysis
+- **RAG Chatbot**: Pinecone-indexed statutory knowledge base answering compliance questions
+- **CAD Pre-Scrutiny**: Technical drawing analysis using Groq vision
+
+---
+
+## 🗺️ Statutory Sectors Covered
+
+| Sector | Key Clearances |
+|---|---|
+| **⚙️ Boiler** | IBR Registration, Safety Valve Cert, Boiler Attendance Certificate, PESO NOC |
+| **🌿 Pollution** | SPCB Consent to Establish (CTE), Consent to Operate (CTO), CPCB Authorization, Environmental Impact Assessment |
+| **🏗️ Factory License** | Factory Plan Approval, Occupier Registration, Fire NOC, Electrical Safety Certificate |
+
+---
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    ANUMATI Platform                          │
+│                                                             │
+│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐  │
+│  │ Entrepreneur  │    │   Officer    │    │  Public      │  │
+│  │  Dashboard   │    │  Dashboard   │    │  Landing     │  │
+│  └──────┬───────┘    └──────┬───────┘    └──────┬───────┘  │
+│         │                   │                   │           │
+│  ┌──────▼───────────────────▼───────────────────▼───────┐  │
+│  │              Next.js 14 App Router (RSC)             │  │
+│  └──────────────────────┬────────────────────────────────┘  │
+│                         │ API Routes                         │
+│  ┌──────────────────────▼────────────────────────────────┐  │
+│  │                   Service Layer                        │  │
+│  │  ┌─────────────┐  ┌──────────────┐  ┌─────────────┐  │  │
+│  │  │  OCR        │  │ Topological  │  │  CAD        │  │  │
+│  │  │  + 2-Layer  │  │  DAG Engine  │  │  Scrutiny   │  │  │
+│  │  │  AI Verify  │  │  (Kahn's)    │  │  Service    │  │  │
+│  │  └──────┬──────┘  └──────────────┘  └─────────────┘  │  │
+│  └─────────┼──────────────────────────────────────────────┘  │
+│            │                                                 │
+│  ┌─────────▼──────────────────────────────────────────────┐  │
+│  │                   Data Layer                            │  │
+│  │   MongoDB Atlas    │   Pinecone Vector DB   │   Groq    │  │
+│  └────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
 ```
 
----
+### Tech Stack
 
-## 🌲 Pinecone Vector Search Setup (RAG Chatbot)
-
-To enable real vector similarity search for the statutory RAG chatbot:
-
-1. **Create a Free Pinecone Index**:
-   - Log in to [Pinecone Console](https://app.pinecone.io).
-   - Create a new Index with the following configuration:
-     - **Index Name**: `anumati-statutory-rag`
-     - **Dimensions**: `384` (matching `@xenova/transformers` sentence-transformers embedding model `Xenova/all-MiniLM-L6-v2`)
-     - **Metric**: `Cosine`
-2. **Configure Environment Variables**:
-   Add your Pinecone API key to `.env.local`:
-   ```env
-   PINECONE_API_KEY=your_pinecone_api_key_here
-   PINECONE_INDEX_NAME=anumati-statutory-rag
-   ```
-3. **Upsert Statutory Knowledge Vectors**:
-   Run the vector embedding and upsert script to populate Pinecone with sector-scoped statutory vectors:
-   ```bash
-   npm run seed:vectors
-   ```
-   *Note: If `PINECONE_API_KEY` is not configured or unreachable, the chatbot automatically falls back to keyword-based retrieval without breaking.*
-
----
-
-## ⚙️ Environment Variables
-
-Copy `.env.example` to `.env.local` before running:
-
-```bash
-cp .env.example .env.local
-```
+| Layer | Technology |
+|---|---|
+| **Framework** | Next.js 14 (App Router, RSC) |
+| **Language** | TypeScript 5 |
+| **Database** | MongoDB Atlas + Mongoose ODM |
+| **AI / LLM** | Groq (Llama 3, Mixtral) |
+| **Vector DB** | Pinecone (RAG pipeline) |
+| **Auth** | HTTP-only JWT cookies + bcrypt |
+| **Styling** | Tailwind CSS + custom gov-navy/gold theme |
+| **Testing** | Jest + ts-jest (64 tests, 14 suites) |
+| **Validation** | Zod schema validation |
+| **Icons** | Lucide React |
 
 ---
 
 ## 🚀 Getting Started
 
-### 1. Install Dependencies
+### Prerequisites
+
+- Node.js 18+
+- MongoDB Atlas cluster (free tier works)
+- Pinecone account (free tier works)
+- Groq API key (free at console.groq.com)
+
+### 1. Clone the repo
+
+```bash
+git clone https://github.com/Nishanth734/sih-anumati.git
+cd sih-anumati
+```
+
+### 2. Install dependencies
+
 ```bash
 npm install
 ```
 
-### 2. Seed the Database
-Populate local MongoDB with realistic demo users, industrial profile, officers, and clearance applications:
-```bash
-npm run seed
+### 3. Environment Variables
+
+Create a `.env.local` file in the root:
+
+```env
+# MongoDB
+MONGODB_URI=mongodb+srv://<user>:<password>@cluster.mongodb.net/anumati
+
+# Auth
+JWT_SECRET=your-super-secret-jwt-key-minimum-32-chars
+
+# Groq LLM
+GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxx
+
+# Pinecone Vector DB
+PINECONE_API_KEY=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+PINECONE_INDEX_NAME=anumati-statutory-docs
+
+# App
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-#### Demo Credentials:
-| Role | Email | Password | Details |
-| :--- | :--- | :--- | :--- |
-| **Entrepreneur** | `entrepreneur@company.com` | `Password123!` | Apex Steel Works (GSTIN: `27AAACR1234K1ZI`) |
-| **Boiler Officer** | `officer.boiler@gov.in` | `Password123!` | Officer ID: `GOV-OFF-101` (Sector: `Boiler`) |
-| **Pollution Officer** | `officer.pollution@gov.in` | `Password123!` | Officer ID: `GOV-OFF-102` (Sector: `Pollution`) |
-| **Factory Officer** | `officer.factory@gov.in` | `Password123!` | Officer ID: `GOV-OFF-103` (Sector: `FactoryLicense`) |
+### 4. Seed the database
 
-### 3. Run Development Server
+```bash
+npx ts-node scripts/seed.ts
+```
+
+This creates demo accounts:
+
+| Role | Email | Password |
+|---|---|---|
+| Entrepreneur | `entrepreneur@company.com` | `Password123!` |
+| Boiler Officer | `officer.boiler@gov.in` | `Password123!` |
+| Pollution Officer | `officer.pollution@gov.in` | `Password123!` |
+| Factory Officer | `officer.factory@gov.in` | `Password123!` |
+
+### 5. Run the dev server
+
 ```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+Open [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 🧪 Running Unit Tests
+## 🧪 Testing
 
-Run all unit tests across the 10 test suites:
 ```bash
-npm test
+npm test                 # Run all 64 tests
+npm test -- --coverage   # With coverage report
+npx tsc --noEmit         # TypeScript type check
+npm run build            # Production build check
+```
+
+**Test coverage:**
+- Document verification pipeline (OCR + Layer 1 + Layer 2)
+- Topological DAG computation (Kahn's algorithm)
+- CAD pre-scrutiny service
+- MRTPS SLA deadline engine
+- API route handlers
+
+---
+
+## 📁 Project Structure
+
+```
+sih-anumati/
+├── app/
+│   ├── api/                     # API route handlers
+│   │   ├── auth/                # Login, signup, logout, /me
+│   │   ├── applications/        # CRUD + certificate generation
+│   │   ├── documents/           # Upload + AI verification
+│   │   ├── roadmap/             # Statutory roadmap data
+│   │   └── chat/                # RAG chatbot endpoint
+│   ├── dashboard/
+│   │   ├── entrepreneur/        # Entrepreneur dashboard
+│   │   └── officer/             # Officer review console
+│   ├── application/[id]/
+│   │   ├── upload/              # Document upload page
+│   │   └── certificate/         # Certificate download
+│   ├── roadmap/                 # Public roadmap explorer
+│   ├── pre-scrutiny/            # CAD pre-scrutiny tool
+│   ├── login/                   # Auth pages
+│   └── signup/
+├── components/
+│   ├── Navbar.tsx               # Responsive sticky navbar
+│   ├── Footer.tsx               # 4-column footer
+│   ├── LoginForm.tsx            # Login with quick-fill
+│   ├── RoadmapViewContainer.tsx # Tabbed roadmap view
+│   ├── TopologicalDAGView.tsx   # DAG visualizer
+│   └── EntrepreneurProfileForm.tsx
+├── lib/
+│   ├── topologicalService.ts    # Kahn's algorithm DAG engine
+│   ├── cadScrutinyService.ts    # CAD AI analysis
+│   ├── mongodb.ts               # DB connection
+│   └── auth.ts                  # JWT utilities
+├── models/                      # Mongoose schemas
+│   ├── User.ts
+│   ├── Application.ts
+│   └── Document.ts
+├── scripts/
+│   └── seed.ts                  # Database seeder
+└── __tests__/                   # Jest test suites
 ```
 
 ---
 
-## 🛡️ License & Compliance
-Official Government Clearance Gateway Software Specification.
+## 🎯 How It Works — Key Flows
+
+### Document Verification Pipeline
+```
+Entrepreneur uploads PDF
+        ↓
+    OCR Extraction (text from PDF)
+        ↓
+    Layer 1: Hard Rules
+    • Regex field validation
+    • Expiry date check
+    • Levenshtein name match
+        ↓
+    Layer 2: AI Semantic Check
+    • Pinecone vector similarity
+    • Groq LLM contextual analysis
+        ↓
+    Result: PASSED ✅ or FAILED ❌
+        ↓
+    All docs PASSED → Application auto-promoted to READY_FOR_REVIEW
+```
+
+### Topological Compliance Roadmap
+```
+User selects sector (Boiler / Pollution / Factory)
+        ↓
+    computeTopologicalTiers() runs Kahn's algorithm
+    on STATUTORY_CLEARANCE_NODES graph
+        ↓
+    Returns tiers: [[Tier 1 nodes], [Tier 2 nodes], ...]
+    (dependencies resolved — get Tier 1 first, then Tier 2, etc.)
+        ↓
+    Rendered as interactive DAG visualization
+    with simulate-progress feature
+```
+
+---
+
+## 👥 Team
+
+**Smart India Hackathon 2024**
+
+| Member | Role |
+|---|---|
+| Nishanth | Full Stack + AI Integration |
+| Pranav | Backend + Database |
+| *(Add your team)* | *(Add roles)* |
+
+---
+
+## 📄 License
+
+This project was built for **Smart India Hackathon 2024**. All rights reserved by the team.
+
+---
+
+<div align="center">
+Made with ❤️ for Smart India Hackathon 2024<br/>
+<strong>ANUMATI — अनुमति</strong> | Empowering Industrial India
+</div>
