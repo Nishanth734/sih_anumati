@@ -306,6 +306,6 @@ This project was built for **Smart India Hackathon 2024**. All rights reserved b
 ---
 
 <div align="center">
-Made with ❤️ for Smart India Hackathon 2024<br/>
+Made with ❤️ for Smart India Hackathon 2026<br/>
 <strong>ANUMATI — अनुमति</strong> | Empowering Industrial India
 </div>
