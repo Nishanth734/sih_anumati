@@ -7,6 +7,7 @@ export interface IApplication extends Document {
   applicantName: string;
   companyName: string;
   sector: "Boiler" | "Pollution" | "FactoryLicense";
+  category: "Green" | "Orange" | "Red";
   title: string;
   description: string;
   estimatedBudget: number;
@@ -18,7 +19,13 @@ export interface IApplication extends Document {
     | "UNDER_REVIEW"
     | "APPROVED"
     | "REJECTED"
-    | "ADDITIONAL_INFO_REQUIRED";
+    | "ADDITIONAL_INFO_REQUIRED"
+    | "DEEMED_APPROVED";
+  slaDeadline?: Date;
+  slaHours?: number;
+  isDeemedApproved?: boolean;
+  deemedApprovalDate?: Date;
+  appellateEscalationDispatched?: boolean;
   assignedOfficerId?: mongoose.Types.ObjectId;
   remarks?: string;
   submissionMethod?: "PDF_TEXT_EXTRACTION" | "OCR" | "MANUAL";
@@ -55,6 +62,12 @@ const ApplicationSchema: Schema<IApplication> = new Schema(
       required: true,
       index: true,
     },
+    category: {
+      type: String,
+      enum: ["Green", "Orange", "Red"],
+      default: "Orange",
+      index: true,
+    },
     title: {
       type: String,
       required: [true, "Application title is required"],
@@ -87,9 +100,29 @@ const ApplicationSchema: Schema<IApplication> = new Schema(
         "APPROVED",
         "REJECTED",
         "ADDITIONAL_INFO_REQUIRED",
+        "DEEMED_APPROVED",
       ],
       default: "PENDING",
       index: true,
+    },
+    slaDeadline: {
+      type: Date,
+      index: true,
+    },
+    slaHours: {
+      type: Number,
+      default: 720,
+    },
+    isDeemedApproved: {
+      type: Boolean,
+      default: false,
+    },
+    deemedApprovalDate: {
+      type: Date,
+    },
+    appellateEscalationDispatched: {
+      type: Boolean,
+      default: false,
     },
     assignedOfficerId: {
       type: Schema.Types.ObjectId,

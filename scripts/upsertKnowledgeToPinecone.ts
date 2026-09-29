@@ -63,8 +63,11 @@ async function upsertToPinecone() {
     });
   }
 
-  console.log(`📤 Upserting ${records.length} vectors to Pinecone index "${indexName}"...`);
-  await index.upsert(records as any);
+  try {
+    await (index as any).upsert({ records });
+  } catch {
+    await (index as any).upsert(records);
+  }
 
   console.log(`✅ Successfully upserted ${records.length} statutory knowledge vectors into Pinecone!`);
   console.log(`   Index Dimension: ${EMBEDDING_DIMENSION} | Metric: Cosine | Metadata Scoped: sector`);

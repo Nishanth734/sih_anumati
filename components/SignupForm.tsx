@@ -88,10 +88,10 @@ export default function SignupForm() {
   };
 
   return (
-    <div className="w-full max-w-xl mx-auto bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
-      <div className="bg-gov-navy px-6 py-5 text-white">
+    <div className="w-full max-w-xl mx-auto bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+      <div className="bg-gov-navy px-6 py-6 text-white border-b border-gov-gold/30">
         <div className="flex items-center gap-2 font-bold text-lg">
-          <ShieldCheck className="w-5 h-5 text-gov-gold" />
+          <ShieldCheck className="w-6 h-6 text-gov-gold" />
           ANUMATI Industrial Portal Registration
         </div>
         <p className="text-xs text-slate-300 mt-1">

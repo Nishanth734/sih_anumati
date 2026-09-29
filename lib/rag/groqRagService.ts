@@ -114,7 +114,8 @@ export async function generateRagAnswer(
   }
 
   try {
-    console.log(`[Groq RAG Service] Invoking Groq LLM model: ${GROQ_MODEL_NAME} for query: "${userQuery}"`);
+    const targetModel = process.env.GROQ_MODEL?.trim() || GROQ_MODEL_NAME;
+    console.log(`[Groq RAG Service] Invoking Groq LLM model: ${targetModel} for query: "${userQuery}"`);
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 12000); // 12 second timeout guard
@@ -126,7 +127,7 @@ export async function generateRagAnswer(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: GROQ_MODEL_NAME,
+        model: targetModel,
         messages: [
           { role: "system", content: SYSTEM_PROMPT(sector) },
           { role: "user", content: promptMessage },

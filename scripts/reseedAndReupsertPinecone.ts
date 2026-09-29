@@ -79,7 +79,7 @@ async function reseedAndReupsert() {
     console.log(`Total records prepared: ${records.length}`);
     if (records.length > 0) {
       try {
-        await index.upsert(records);
+        await (index as any).upsert(records);
       } catch (err) {
         await (index as any).upsert({ records });
       }

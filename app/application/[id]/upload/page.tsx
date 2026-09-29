@@ -332,68 +332,66 @@ export default function DocumentUploadPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center p-6">
+      <div className="py-24 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <RefreshCw className="w-10 h-10 text-amber-400 animate-spin" />
-          <p className="text-slate-400 font-medium">Loading Document Verification Portal...</p>
+          <RefreshCw className="w-10 h-10 text-amber-500 animate-spin" />
+          <p className="text-slate-600 font-medium text-sm">Loading Document Verification Portal...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 pb-16">
-      {/* Top Header Navigation */}
-      <header className="sticky top-0 z-30 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <Link
-              href="/dashboard/entrepreneur"
-              className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition"
-              title="Return to Dashboard"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                  {application?.sector} Sector
-                </span>
-                <span className="text-xs text-slate-400 font-mono">#{application?.applicationNumber}</span>
-              </div>
-              <h1 className="text-xl font-bold text-white tracking-tight mt-0.5">{application?.companyName}</h1>
+    <div className="space-y-6 pb-12">
+      {/* Top Application Context Bar */}
+      <div className="bg-gov-navy text-white rounded-2xl p-5 shadow-sm border border-gov-gold/20 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <Link
+            href="/dashboard/entrepreneur"
+            className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white transition"
+            title="Return to Dashboard"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                {application?.sector} Sector
+              </span>
+              <span className="text-xs text-slate-300 font-mono">#{application?.applicationNumber}</span>
             </div>
+            <h1 className="text-xl font-bold text-white tracking-tight mt-0.5">{application?.companyName}</h1>
           </div>
+        </div>
 
-          <div className="flex items-center gap-3">
-            <div className="text-right hidden sm:block">
-              <span className="text-xs text-slate-400">Verification Status</span>
-              <div className="flex items-center gap-1.5 font-medium text-sm">
-                {hasAnyFailure ? (
-                  <span className="text-red-400 flex items-center gap-1">
-                    <AlertTriangle className="w-4 h-4" /> Action Required — Fix Failed Verification
-                  </span>
-                ) : passedDocsCount < totalRequiredCount ? (
-                  <span className="text-amber-400 flex items-center gap-1">
-                    <HelpCircle className="w-4 h-4" /> Incomplete — {passedDocsCount} of {totalRequiredCount} Statutory Documents Verified
-                  </span>
-                ) : application?.status === "APPROVED" && allRequiredPassed ? (
-                  <span className="text-emerald-400 flex items-center gap-1">
-                    <CheckCircle2 className="w-4 h-4" /> Approved & Statutory Clearance Granted
-                  </span>
-                ) : (
-                  <span className="text-emerald-400 flex items-center gap-1">
-                    <CheckCircle2 className="w-4 h-4" /> All {totalRequiredCount} Passed — Ready for Officer Review
-                  </span>
-                )}
-              </div>
+        <div className="flex items-center gap-3">
+          <div className="text-right hidden sm:block">
+            <span className="text-[11px] text-slate-300 uppercase tracking-wider font-semibold">Verification Status</span>
+            <div className="flex items-center gap-1.5 font-medium text-sm mt-0.5">
+              {hasAnyFailure ? (
+                <span className="text-red-300 flex items-center gap-1 font-semibold">
+                  <AlertTriangle className="w-4 h-4 text-red-400" /> Action Required — Fix Failed Verification
+                </span>
+              ) : passedDocsCount < totalRequiredCount ? (
+                <span className="text-amber-300 flex items-center gap-1 font-semibold">
+                  <HelpCircle className="w-4 h-4 text-amber-400" /> Incomplete — {passedDocsCount} of {totalRequiredCount} Documents Verified
+                </span>
+              ) : application?.status === "APPROVED" && allRequiredPassed ? (
+                <span className="text-emerald-300 flex items-center gap-1 font-semibold">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Approved &amp; Statutory Clearance Granted
+                </span>
+              ) : (
+                <span className="text-emerald-300 flex items-center gap-1 font-semibold">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" /> All {totalRequiredCount} Passed — Ready for Officer Review
+                </span>
+              )}
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto px-6 pt-8 space-y-8">
+      <div className="space-y-6">
         {/* Status Alert Banner */}
         {hasAnyFailure && (
           <div className="bg-red-950/40 border border-red-800/60 rounded-xl p-5 text-red-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-lg">
@@ -654,7 +652,7 @@ export default function DocumentUploadPage() {
             );
           })}
         </div>
-      </main>
+      </div>
 
       {/* Failure Details Modal */}
       {selectedFailureDoc && (

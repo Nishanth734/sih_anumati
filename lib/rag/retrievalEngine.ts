@@ -99,7 +99,7 @@ async function retrieveRelevantChunksKeywordFallback(
   if (!chunks || chunks.length === 0) return [];
 
   const queryTokens = tokenizeText(query);
-  const scored = chunks.map((chunk) => {
+  const scored = chunks.map((chunk: any) => {
     const score = scoreChunk(chunk, queryTokens, query);
     return {
       chunkId: chunk.chunkId,
@@ -111,7 +111,7 @@ async function retrieveRelevantChunksKeywordFallback(
     };
   });
 
-  scored.sort((a, b) => b.score - a.score);
+  scored.sort((a: any, b: any) => b.score - a.score);
   return scored.slice(0, topK);
 }
 

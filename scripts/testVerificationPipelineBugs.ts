@@ -83,7 +83,7 @@ async function runBugVerificationTests() {
   console.log(`Passed Documents:    ${passedCount}`);
   console.log(`Computed App Status: "${testApp.status}"`);
   console.log(`Expected Display:    "Incomplete — 1 of 4 Statutory Documents Verified"`);
-  console.log(`NEVER Approved?:     ${testApp.status !== "APPROVED" && testApp.status !== "READY_FOR_REVIEW" ? "PASS ✅ (Not Approved)" : "FAIL ❌"}\n`);
+  console.log(`NEVER Approved?:     ${(testApp.status as string) !== "APPROVED" && (testApp.status as string) !== "READY_FOR_REVIEW" ? "PASS ✅ (Not Approved)" : "FAIL ❌"}\n`);
 
   // --------------------------------------------------------------------------
   // BUG 2 TEST SCENARIO B: Completing All 4 Required Documents (All Passed)

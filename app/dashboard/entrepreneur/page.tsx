@@ -22,6 +22,7 @@ import {
   UploadCloud,
   RefreshCw,
   LogOut,
+  Award,
 } from "lucide-react";
 import RecommendedSchemes from "@/components/RecommendedSchemes";
 
@@ -30,10 +31,21 @@ interface ApplicationItem {
   applicationNumber: string;
   title: string;
   sector: "Boiler" | "Pollution" | "FactoryLicense";
+  category?: "Green" | "Orange" | "Red";
   description: string;
   estimatedBudget: number;
   plantLocation: string;
-  status: "PENDING" | "UNDER_REVIEW" | "APPROVED" | "REJECTED" | "ADDITIONAL_INFO_REQUIRED";
+  status:
+    | "PENDING"
+    | "RETURNED_TO_APPLICANT"
+    | "READY_FOR_REVIEW"
+    | "UNDER_REVIEW"
+    | "APPROVED"
+    | "REJECTED"
+    | "ADDITIONAL_INFO_REQUIRED"
+    | "DEEMED_APPROVED";
+  slaDeadline?: string;
+  isDeemedApproved?: boolean;
   remarks?: string;
   createdAt: string;
 }
@@ -295,6 +307,12 @@ export default function EntrepreneurDashboard() {
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Approved
           </span>
         );
+      case "DEEMED_APPROVED":
+        return (
+          <span className="inline-flex items-center gap-1 text-xs font-semibold bg-amber-100 text-amber-900 border border-amber-300 px-2.5 py-1 rounded-full">
+            <Sparkles className="w-3.5 h-3.5 text-amber-600" /> Deemed Approved (MRTPS Sec. 8)
+          </span>
+        );
       case "REJECTED":
         return (
           <span className="inline-flex items-center gap-1 text-xs font-semibold bg-red-100 text-red-800 px-2.5 py-1 rounded-full">
@@ -326,6 +344,39 @@ export default function EntrepreneurDashboard() {
           </span>
         );
     }
+  };
+
+  const getSlaBadge = (app: ApplicationItem) => {
+    if (app.status === "APPROVED" || app.status === "REJECTED") return null;
+    if (app.status === "DEEMED_APPROVED" || app.isDeemedApproved) {
+      return (
+        <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+          <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Statutory SLA Enforced
+        </span>
+      );
+    }
+    if (!app.slaDeadline) return null;
+    const diffMs = new Date(app.slaDeadline).getTime() - Date.now();
+    const diffHours = Math.round(diffMs / (3600 * 1000));
+    if (diffHours <= 0) {
+      return (
+        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded border border-red-200 animate-pulse">
+          <Clock className="w-3 h-3 text-red-600" /> SLA Overdue (MRTPS Enforceable)
+        </span>
+      );
+    }
+    const isUrgent = diffHours <= 24;
+    return (
+      <span
+        className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded border ${
+          isUrgent
+            ? "text-amber-800 bg-amber-50 border-amber-200"
+            : "text-slate-600 bg-slate-50 border-slate-200"
+        }`}
+      >
+        <Clock className="w-3 h-3" /> {diffHours}h statutory SLA
+      </span>
+    );
   };
 
   const getSectorIcon = (sector: string) => {
@@ -477,9 +528,22 @@ export default function EntrepreneurDashboard() {
                       )}
                     </td>
                     <td className="px-6 py-4">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 text-slate-800 rounded-md font-medium text-[11px]">
-                        {getSectorIcon(app.sector)} {app.sector}
-                      </span>
+                      <div className="flex flex-col gap-1 items-start">
+                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-slate-100 text-slate-800 rounded font-medium text-[11px]">
+                          {getSectorIcon(app.sector)} {app.sector}
+                        </span>
+                        <span
+                          className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                            app.category === "Green"
+                              ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                              : app.category === "Red"
+                              ? "bg-red-100 text-red-800 border border-red-200"
+                              : "bg-amber-100 text-amber-800 border border-amber-200"
+                          }`}
+                        >
+                          {app.category || "Orange"} Category
+                        </span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-slate-600">
                       <div className="flex items-center gap-1 font-semibold text-slate-800">
@@ -489,17 +553,30 @@ export default function EntrepreneurDashboard() {
                         <MapPin className="w-3 h-3 text-slate-400" /> {app.plantLocation}
                       </div>
                     </td>
-                    <td className="px-6 py-4">{getStatusBadge(app.status)}</td>
+                    <td className="px-6 py-4 space-y-1">
+                      <div>{getStatusBadge(app.status)}</div>
+                      <div>{getSlaBadge(app)}</div>
+                    </td>
                     <td className="px-6 py-4 text-slate-500 text-[11px]">
                       {new Date(app.createdAt).toLocaleDateString("en-IN")}
                     </td>
                     <td className="px-6 py-4">
-                      <Link
-                        href={`/application/${app._id}/upload`}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gov-navy hover:bg-slate-800 text-white rounded-md text-xs font-semibold shadow-sm transition"
-                      >
-                        <UploadCloud className="w-3.5 h-3.5 text-gov-gold" /> Upload Docs
-                      </Link>
+                      <div className="flex flex-col gap-1.5 items-start">
+                        {app.status === "APPROVED" || app.status === "DEEMED_APPROVED" ? (
+                          <Link
+                            href={`/application/${app._id}/certificate`}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-md text-xs font-bold shadow-sm transition"
+                          >
+                            <Award className="w-3.5 h-3.5" /> View Certificate
+                          </Link>
+                        ) : null}
+                        <Link
+                          href={`/application/${app._id}/upload`}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gov-navy hover:bg-slate-800 text-white rounded-md text-xs font-semibold shadow-sm transition"
+                        >
+                          <UploadCloud className="w-3.5 h-3.5 text-gov-gold" /> Upload Docs
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 ))}

@@ -135,7 +135,7 @@ export async function POST(req: NextRequest) {
     const isOverallPassed = verification.passed && ragResult.compliant;
     const combinedFailures = [
       ...verification.failures,
-      ...ragResult.missing_elements.map((m) => `[RAG Rule Check] Missing: ${m}`),
+      ...ragResult.missing_elements.map((m: string) => `[RAG Rule Check] Missing: ${m}`),
     ];
 
     // Save or update Document record for this application and documentType slot

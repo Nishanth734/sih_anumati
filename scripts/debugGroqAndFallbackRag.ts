@@ -1,8 +1,27 @@
+import fs from "fs";
+import path from "path";
 import connectDB from "../lib/db";
 import { processDocumentOCR } from "../lib/ocrProcessor";
 import { verifyDocumentRagCompliance } from "../lib/rag/documentRagVerifier";
 import { seedSectorKnowledge } from "../lib/rag/seedKnowledge";
 import { renderTextToBmp } from "./createMockPanImage";
+
+try {
+  const envPath = path.resolve(process.cwd(), ".env.local");
+  if (fs.existsSync(envPath)) {
+    const envConfig = fs.readFileSync(envPath, "utf8");
+    for (const line of envConfig.split("\n")) {
+      const match = line.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/);
+      if (match) {
+        const key = match[1];
+        let value = (match[2] || "").trim();
+        if (value.startsWith('"') && value.endsWith('"')) value = value.slice(1, -1);
+        if (value.startsWith("'") && value.endsWith("'")) value = value.slice(1, -1);
+        if (!process.env[key]) process.env[key] = value;
+      }
+    }
+  }
+} catch {}
 
 async function debugGroqAndFallbackRag() {
   console.log("==========================================================================");

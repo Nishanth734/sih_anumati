@@ -148,18 +148,26 @@ export async function POST(req: NextRequest) {
     const seq = (count + 1).toString().padStart(4, "0");
     const applicationNumber = `ANM-${validatedData.sector.toUpperCase()}-${new Date().getFullYear()}-${seq}`;
 
+    const category = ["Green", "Orange", "Red"].includes(body.category) ? body.category : "Orange";
+    const slaHours = category === "Green" ? 48 : 720;
+    const slaDeadline = new Date(Date.now() + slaHours * 60 * 60 * 1000);
+
     const newApplication = await Application.create({
       applicationNumber,
       applicantId: userPayload.userId,
       applicantName: userPayload.name,
       companyName: userPayload.companyName || userPayload.name,
       sector: validatedData.sector,
+      category,
       title: validatedData.title,
       description: validatedData.description,
       estimatedBudget: validatedData.estimatedBudget,
       plantLocation: validatedData.plantLocation,
       submissionMethod,
       status: "PENDING",
+      slaHours,
+      slaDeadline,
+      isDeemedApproved: false,
     });
 
     await AuditLog.create({

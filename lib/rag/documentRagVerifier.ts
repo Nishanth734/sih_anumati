@@ -150,7 +150,7 @@ export async function verifyDocumentRagCompliance(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: GROQ_MODEL_NAME,
+        model: process.env.GROQ_MODEL?.trim() || GROQ_MODEL_NAME,
         messages: [
           { role: "system", content: RAG_VERIFICATION_PROMPT(sector, documentName) },
           { role: "user", content: promptMessage },
