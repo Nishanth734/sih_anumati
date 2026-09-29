@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![ANUMATI Banner](https://img.shields.io/badge/Smart%20India%20Hackathon-2024-orange?style=for-the-badge)
+![ANUMATI Banner](https://img.shields.io/badge/Smart%20India%20Hackathon-2026-orange?style=for-the-badge)
 ![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)
 ![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green?style=for-the-badge&logo=mongodb)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)
@@ -18,7 +18,7 @@
 
 ## 📌 Problem Statement
 
-**Smart India Hackathon 2024**
+**Smart India Hackathon **
 
 Industrial entrepreneurs in India face a fragmented, paper-heavy process to obtain statutory clearances — Boiler licenses, Factory licenses, Pollution Control certificates — across multiple departments with no unified visibility. Delays cost crores in idle capital and discourage MSME growth.
 
@@ -289,7 +289,7 @@ User selects sector (Boiler / Pollution / Factory)
 
 ## 👥 Team
 
-**Smart India Hackathon 2024**
+**Smart India Hackathon **
 
 | Member | Role |
 |---|---|
@@ -301,7 +301,7 @@ User selects sector (Boiler / Pollution / Factory)
 
 ## 📄 License
 
-This project was built for **Smart India Hackathon 2024**. All rights reserved by the team.
+This project was built for **Smart India Hackathon **. All rights reserved by the team.
 
 ---
 
